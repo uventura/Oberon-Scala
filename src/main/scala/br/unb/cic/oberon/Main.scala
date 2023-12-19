@@ -38,6 +38,12 @@ object Main extends App with Oberon2ScalaParser {
         argName = "path",
         required = true
       )
+      val isVerbose = opt[Boolean](
+        name = "verbose",
+        descr = "Dump the environment in end of execution.",
+        argName = "verbose",
+        required = false
+      )
       validatePathExists(inputPath)
     }
 
@@ -108,9 +114,14 @@ object Main extends App with Oberon2ScalaParser {
   private def interpret() = {
     val content = Files.readString(conf.interpreter.inputPath.get.get)
     val module = parseAbs(parse(oberonParser,content))
-
+    val isVerbose = (conf.interpreter.isVerbose.get.get)
+    
     val interpreter = new Interpreter()
     val result = interpreter.runInterpreter(module)
+
+    if (isVerbose)
+        result.dumpAttributes()
+    
   }
 
   private def typeCheck() = {
